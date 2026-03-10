@@ -12,9 +12,11 @@ Shared abstractions for structured population projection models in Julia. This p
 
 ## Installation
 
+This package is not yet registered in the Julia General registry. Install directly from GitHub:
+
 ```julia
 using Pkg
-Pkg.add("ProjectionModels")
+Pkg.add(url="https://github.com/ecorecipes/ProjectionModels.jl")
 ```
 
 ## Related
