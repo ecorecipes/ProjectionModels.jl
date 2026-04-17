@@ -1,10 +1,10 @@
-# ProjectionModels.jl
+# StructuredPopulationCore.jl
 
 Shared abstractions for structured population projection models in Julia.
 
 ## Overview
 
-ProjectionModels.jl provides the common type hierarchy, eigenanalysis routines, matrix diagnostics, and utility functions used across the [ecorecipes](https://github.com/ecorecipes) family of population modeling packages. It is not typically used on its own but serves as the foundation for higher-level packages.
+StructuredPopulationCore.jl provides the common type hierarchy, eigenanalysis routines, matrix diagnostics, and utility functions used across the [ecorecipes](https://github.com/ecorecipes) family of population modeling packages. It is not typically used on its own but serves as the foundation for higher-level packages.
 
 Key capabilities include:
 
@@ -18,7 +18,7 @@ Key capabilities include:
 ## Quick Example
 
 ```julia
-using ProjectionModels, LinearAlgebra
+using StructuredPopulationCore, LinearAlgebra
 
 # A simple 2-stage projection matrix
 A = [0.0  3.0;
@@ -38,6 +38,8 @@ E = elasticity(A)
 
 ## Related Packages
 
-- [MatrixPopulationModels.jl](https://github.com/ecorecipes/MatrixPopulationModels.jl) -- matrix population models (MPMs)
+- [MatrixProjectionModels.jl](https://github.com/ecorecipes/MatrixProjectionModels.jl) -- discrete-time matrix projection models
 - [IntegralProjectionModels.jl](https://github.com/ecorecipes/IntegralProjectionModels.jl) -- integral projection models (IPMs)
-- [CompositePopulationModels.jl](https://github.com/ecorecipes/CompositePopulationModels.jl) -- composite population models (CPMs)
+- [FiniteStatePopulationDynamics.jl](https://github.com/ecorecipes/FiniteStatePopulationDynamics.jl) -- finite-state continuous-time dynamics
+- [ContinuousStatePopulationDynamics.jl](https://github.com/ecorecipes/ContinuousStatePopulationDynamics.jl) -- continuous-state continuous-time dynamics
+- [CategoricalPopulationDynamics.jl](https://github.com/ecorecipes/CategoricalPopulationDynamics.jl) -- compositional categorical modeling

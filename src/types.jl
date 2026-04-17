@@ -8,10 +8,92 @@ Shared abstract types and trait types for projection models.
     AbstractProjectionStructure
 
 Supertype for projection model structure traits.
-Subtypes: `AbstractIPMStructure` (in IntegralProjectionModels),
-          `AbstractMPMStructure` (in MatrixProjectionModels).
+Subtypes include shared continuous-state structures plus
+package-specific specializations.
 """
 abstract type AbstractProjectionStructure end
+
+"""
+    AbstractContinuousStateStructure
+
+Shared supertype for continuous-state model structures. This is used by both
+discrete-time integral projection models and the forthcoming continuous-state
+continuous-time backends.
+"""
+abstract type AbstractContinuousStateStructure <: AbstractProjectionStructure end
+
+"""
+    AbstractIPMStructure
+
+Compatibility supertype for the existing integral projection model structure
+names. It remains available as part of the shared abstraction layer so current
+IPM code can keep its API while new packages dispatch on the more neutral
+`AbstractContinuousStateStructure`.
+"""
+abstract type AbstractIPMStructure <: AbstractContinuousStateStructure end
+
+"""
+    SimpleIPM
+
+Single continuous-state structure.
+"""
+struct SimpleIPM <: AbstractIPMStructure end
+
+"""
+    GeneralIPM
+
+Multi-state or otherwise generalized continuous-state structure.
+"""
+struct GeneralIPM <: AbstractIPMStructure end
+
+const SimpleContinuousState = SimpleIPM
+const GeneralContinuousState = GeneralIPM
+
+# --- Time semantics traits ---
+
+"""
+    AbstractTimeSemantics
+
+Supertype for time-semantics traits.
+"""
+abstract type AbstractTimeSemantics end
+
+"""
+    DiscreteTime
+
+One-step update semantics over a discrete clock.
+"""
+struct DiscreteTime <: AbstractTimeSemantics end
+
+"""
+    ContinuousTime
+
+Infinitesimal-generator semantics over continuous time.
+"""
+struct ContinuousTime <: AbstractTimeSemantics end
+
+# --- State space semantics traits ---
+
+"""
+    AbstractStateSemantics
+
+Supertype for state-space semantics traits.
+"""
+abstract type AbstractStateSemantics end
+
+"""
+    FiniteState
+
+Finite-dimensional or explicitly enumerated state space.
+"""
+struct FiniteState <: AbstractStateSemantics end
+
+"""
+    ContinuousState
+
+Continuum-valued or discretized-from-continuum state space.
+"""
+struct ContinuousState <: AbstractStateSemantics end
 
 # --- Density dependence traits ---
 
@@ -82,3 +164,24 @@ Compute eigendecomposition of the materialized kernel matrix.
 No iteration is performed; returns asymptotic quantities directly.
 """
 struct EigenAnalysis end
+
+"""
+    DelayGeneratorTerm(lag, operator)
+
+A shared delayed linear contribution for continuous-time generator formulations.
+The operator may be a matrix or a callable returning one.
+"""
+struct DelayGeneratorTerm{T<:Real, O}
+    lag::T
+    operator::O
+
+    function DelayGeneratorTerm{T, O}(lag::T, operator::O) where {T<:Real, O}
+        lag > zero(T) || throw(ArgumentError("lag must be positive"))
+        new{T, O}(lag, operator)
+    end
+end
+
+function DelayGeneratorTerm(lag::Real, operator)
+    T = typeof(float(lag))
+    DelayGeneratorTerm{T, typeof(operator)}(T(lag), operator)
+end

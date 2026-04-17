@@ -1,13 +1,13 @@
-using Documenter, ProjectionModels
+using Documenter, StructuredPopulationCore
 
 makedocs(;
-    modules = [ProjectionModels],
+    modules = [StructuredPopulationCore],
     warnonly = true,
     authors = "Simon Frost",
-    sitename = "ProjectionModels.jl",
+    sitename = "StructuredPopulationCore.jl",
     format = Documenter.HTML(;
         prettyurls = get(ENV, "CI", "false") == "true",
-        canonical = "https://ecorecipes.github.io/ProjectionModels.jl",
+        canonical = "https://ecorecipes.github.io/StructuredPopulationCore.jl",
     ),
     pages = [
         "Home" => "index.md",
@@ -23,5 +23,5 @@ makedocs(;
 )
 
 deploydocs(;
-    repo = "github.com/ecorecipes/ProjectionModels.jl.git",
+    repo = "github.com/ecorecipes/StructuredPopulationCore.jl.git",
 )

@@ -1,4 +1,4 @@
-module ProjectionModels
+module StructuredPopulationCore
 
 using LinearAlgebra
 using Statistics
@@ -6,9 +6,20 @@ using Statistics
 # Types and traits
 include("types.jl")
 export AbstractProjectionStructure
+export AbstractContinuousStateStructure, AbstractIPMStructure
+export SimpleIPM, GeneralIPM
+export SimpleContinuousState, GeneralContinuousState
+export AbstractTimeSemantics, DiscreteTime, ContinuousTime
+export AbstractStateSemantics, FiniteState, ContinuousState
 export AbstractDensityDependence, DensityIndependent, DensityDependent
 export AbstractStochasticity, Deterministic, StochasticKernelResampled, StochasticParameterResampled
 export DirectIteration, EigenAnalysis
+export DelayGeneratorTerm
+
+# Shared domains
+include("domains.jl")
+export AbstractStateDomain, ContinuousDomain, DiscreteDomain
+export meshpoints, step_size, bounds, n_states
 
 # Solution interface
 include("solution.jl")
@@ -32,6 +43,12 @@ export is_irreducible, is_primitive, is_ergodic
 include("utils.jl")
 export area_under_curve
 
+# State block layouts
+include("state_blocks.jl")
+export StateBlockLayout
+export blocknames, blockrange, blockranges
+export split_state, combine_state
+
 # Time-lag support
 include("time_lag.jl")
 export TimeLagStructure
@@ -39,4 +56,4 @@ export expand_lag_matrix, extract_lag_components
 export augment_population, extract_population
 export net_repro_rate_lagged, generation_time_lagged
 
-end # module ProjectionModels
+end # module StructuredPopulationCore

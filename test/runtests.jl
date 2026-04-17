@@ -1,8 +1,8 @@
 using Test
-using ProjectionModels
+using StructuredPopulationCore
 using LinearAlgebra
 
-@testset "ProjectionModels" begin
+@testset "StructuredPopulationCore" begin
 
     @testset "Types" begin
         @test DensityIndependent() isa AbstractDensityDependence
@@ -12,6 +12,8 @@ using LinearAlgebra
         @test StochasticParameterResampled() isa AbstractStochasticity
         @test DirectIteration() isa DirectIteration
         @test EigenAnalysis() isa EigenAnalysis
+        @test DelayGeneratorTerm(1.0, zeros(2, 2)) isa DelayGeneratorTerm
+        @test_throws ArgumentError DelayGeneratorTerm(0.0, zeros(1, 1))
     end
 
     # Test matrix: Leslie-style 3x3
@@ -107,6 +109,8 @@ using LinearAlgebra
         @test area_under_curve([1.0], [2.0]) == 0.0
     end
 
+    include("test_shared_continuous.jl")
+    include("test_state_blocks.jl")
     include("test_time_lag.jl")
 
 end

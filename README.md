@@ -1,6 +1,6 @@
-# ProjectionModels.jl
+# StructuredPopulationCore.jl
 
-Shared abstractions for structured population projection models in Julia. This package provides the common types, eigenanalysis routines, and analysis functions used by [MatrixProjectionModels.jl](https://github.com/ecorecipes/MatrixProjectionModels.jl), [IntegralProjectionModels.jl](https://github.com/ecorecipes/IntegralProjectionModels.jl), and [CategoricalProjectionModels.jl](https://github.com/ecorecipes/CategoricalProjectionModels.jl).
+Shared abstractions for structured population modeling in Julia. This package provides the common types, eigenanalysis routines, and analysis functions used by [MatrixProjectionModels.jl](https://github.com/ecorecipes/MatrixProjectionModels.jl), [IntegralProjectionModels.jl](https://github.com/ecorecipes/IntegralProjectionModels.jl), [FiniteStatePopulationDynamics.jl](https://github.com/ecorecipes/FiniteStatePopulationDynamics.jl), [ContinuousStatePopulationDynamics.jl](https://github.com/ecorecipes/ContinuousStatePopulationDynamics.jl), and [CategoricalPopulationDynamics.jl](https://github.com/ecorecipes/CategoricalPopulationDynamics.jl).
 
 ## Features
 
@@ -16,11 +16,14 @@ This package is not yet registered in the Julia General registry. Install direct
 
 ```julia
 using Pkg
-Pkg.add(url="https://github.com/ecorecipes/ProjectionModels.jl")
+Pkg.add(url="https://github.com/ecorecipes/StructuredPopulationCore.jl")
 ```
 
 ## Related
 
 - [MatrixProjectionModels.jl](https://github.com/ecorecipes/MatrixProjectionModels.jl) — discrete-stage matrix models
 - [IntegralProjectionModels.jl](https://github.com/ecorecipes/IntegralProjectionModels.jl) — continuous-state integral projection models
-- [CategoricalProjectionModels.jl](https://github.com/ecorecipes/CategoricalProjectionModels.jl) — categorical/functorial framework
+- [FiniteStatePopulationDynamics.jl](https://github.com/ecorecipes/FiniteStatePopulationDynamics.jl) — finite-state continuous-time dynamics
+- [ContinuousStatePopulationDynamics.jl](https://github.com/ecorecipes/ContinuousStatePopulationDynamics.jl) — continuous-state continuous-time dynamics
+- [CategoricalPopulationDynamics.jl](https://github.com/ecorecipes/CategoricalPopulationDynamics.jl) — categorical/functorial framework
+- [PhysiologicallyBasedDemographicModels.jl](https://github.com/ecorecipes/PhysiologicallyBasedDemographicModels.jl) — application-level PBDM reference suite
