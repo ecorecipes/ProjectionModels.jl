@@ -46,7 +46,21 @@ Multi-state or otherwise generalized continuous-state structure.
 """
 struct GeneralIPM <: AbstractIPMStructure end
 
+"""
+    SimpleContinuousState
+
+Alias of [`SimpleIPM`](@ref). Use this name when writing code at the
+generic continuous-state-structure level (e.g., for finite-element or
+non-IPM continuous-state schemes).
+"""
 const SimpleContinuousState = SimpleIPM
+
+"""
+    GeneralContinuousState
+
+Alias of [`GeneralIPM`](@ref). Use this name when writing code at the
+generic multi-state continuous-state level.
+"""
 const GeneralContinuousState = GeneralIPM
 
 # --- Time semantics traits ---

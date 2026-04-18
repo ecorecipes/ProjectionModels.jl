@@ -13,6 +13,7 @@ makedocs(;
         "Home" => "index.md",
         "API Reference" => [
             "Types" => "api/types.md",
+            "State Domains & Blocks" => "api/state_blocks.md",
             "Analysis" => "api/analysis.md",
             "Eigenanalysis" => "api/eigenanalysis.md",
             "Matrix Properties" => "api/properties.md",

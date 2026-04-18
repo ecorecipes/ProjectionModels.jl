@@ -71,5 +71,12 @@ struct DiscreteDomain <: AbstractStateDomain
     labels::Vector{Symbol}
 end
 
+"""
+    n_states(d::AbstractStateDomain)
+
+Number of state classes represented by `d`. For a `DiscreteDomain` this
+is the number of named levels; for a `ContinuousDomain` it is the
+number of mesh points.
+"""
 n_states(d::DiscreteDomain) = length(d.labels)
 n_states(d::ContinuousDomain) = d.n_meshpoints
