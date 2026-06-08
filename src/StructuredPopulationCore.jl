@@ -35,6 +35,13 @@ export lambda, stable_distribution, reproductive_value
 export sensitivity, elasticity, damping_ratio
 export stochastic_growth_rate, mean_kernel
 
+# LTRE analysis
+include("ltre.jl")
+export LTREResult, StochasticLTREResult, SNALTREResult
+export ExactLTREResult, RandomLTREResult
+export ltre, stochastic_ltre, sna_ltre
+export ltre_random, exact_ltre, gmatrix
+
 # Matrix properties
 include("properties.jl")
 export is_irreducible, is_primitive, is_ergodic
