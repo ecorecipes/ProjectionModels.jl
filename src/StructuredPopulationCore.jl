@@ -63,4 +63,13 @@ export expand_lag_matrix, extract_lag_components
 export augment_population, extract_population
 export net_repro_rate_lagged, generation_time_lagged
 
+# Quasi-extinction analysis
+include("quasi_extinction.jl")
+export QuasiExtinctionResult, quasi_extinction
+
+# Markov environment switching
+include("markov_environment.jl")
+export MarkovEnvironment, sample_next, sample_initial
+export simulate_environments, project_markov
+
 end # module StructuredPopulationCore
