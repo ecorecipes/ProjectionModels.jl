@@ -113,5 +113,6 @@ using LinearAlgebra
     include("test_state_blocks.jl")
     include("test_time_lag.jl")
     include("test_ltre.jl")
+    include("test_demographic.jl")
 
 end

@@ -162,6 +162,18 @@ Environmental stochasticity via resampling parameters that generate kernels at e
 """
 struct StochasticParameterResampled <: AbstractStochasticity end
 
+"""
+    Demographic
+
+Demographic stochasticity: finite-population randomness in which individual fates
+(survival, movement, reproduction) are realized as integer-valued random draws
+whose conditional mean reproduces the deterministic operator. Realized per time
+step for discrete-time models (multinomial survival + Poisson fecundity) and as a
+continuous-time Markov jump process for continuous-time models. See
+[`demographic_step!`](@ref) and [`DemographicReactionSystem`](@ref).
+"""
+struct Demographic <: AbstractStochasticity end
+
 # --- Algorithm types ---
 
 """

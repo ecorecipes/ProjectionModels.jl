@@ -2,6 +2,7 @@ module StructuredPopulationCore
 
 using LinearAlgebra
 using Statistics
+using Random
 
 # Types and traits
 include("types.jl")
@@ -13,6 +14,7 @@ export AbstractTimeSemantics, DiscreteTime, ContinuousTime
 export AbstractStateSemantics, FiniteState, ContinuousState
 export AbstractDensityDependence, DensityIndependent, DensityDependent
 export AbstractStochasticity, Deterministic, StochasticKernelResampled, StochasticParameterResampled
+export Demographic
 export DirectIteration, EigenAnalysis
 export DelayGeneratorTerm
 
@@ -71,5 +73,11 @@ export QuasiExtinctionResult, quasi_extinction
 include("markov_environment.jl")
 export MarkovEnvironment, sample_next, sample_initial
 export simulate_environments, project_markov
+
+# Demographic stochasticity primitives + reaction IR
+include("demographic.jl")
+export rand_poisson, demographic_step, demographic_step!
+export DemographicReaction, DemographicReactionSystem
+export propensities!, total_propensity, apply_reaction!, gillespie
 
 end # module StructuredPopulationCore
