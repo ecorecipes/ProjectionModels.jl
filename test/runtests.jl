@@ -114,5 +114,6 @@ using LinearAlgebra
     include("test_time_lag.jl")
     include("test_ltre.jl")
     include("test_demographic.jl")
+    include("test_individual_samplers.jl")
 
 end

@@ -81,4 +81,9 @@ export DemographicReaction, DemographicReactionSystem
 export propensities!, total_propensity, apply_reaction!, gillespie
 export generator_reactions, num_reactions, cle_drift!, cle_noise!
 
+# Individual-level vital-rate samplers (for individual-based / ECS realizations)
+include("individual_samplers.jl")
+export sample_survives, sample_growth, sample_recruit
+export expected_offspring, offspring_count, sample_from_density
+
 end # module StructuredPopulationCore
