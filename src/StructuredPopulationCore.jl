@@ -79,5 +79,6 @@ include("demographic.jl")
 export rand_poisson, demographic_step, demographic_step!
 export DemographicReaction, DemographicReactionSystem
 export propensities!, total_propensity, apply_reaction!, gillespie
+export generator_reactions, num_reactions, cle_drift!, cle_noise!
 
 end # module StructuredPopulationCore

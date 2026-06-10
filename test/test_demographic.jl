@@ -62,4 +62,28 @@ using Statistics
         finals = [gillespie(rng, sys, [10], (0.0, tend))[2][end][1] for _ in 1:2000]
         @test isapprox(mean(finals), 10 * exp(b * tend); rtol=0.06)
     end
+
+    @testset "generator_reactions" begin
+        G = [-0.8 0.4; 0.8 -0.4]                       # conservative
+        sys = generator_reactions(G)
+        @test sys isa DemographicReactionSystem && sys.n_states == 2
+        @test num_reactions(sys) == 2                   # two migrations, zero column sums
+        # negative off-diagonal is rejected
+        @test_throws ArgumentError generator_reactions([-0.5 -0.2; 0.0 -0.3])
+        # constant source adds immigration reactions
+        @test num_reactions(generator_reactions(G; source=[1.0, 0.0])) == 3
+    end
+
+    @testset "chemical Langevin drift/noise" begin
+        G = [-0.5 0.3; 0.5 -0.6]
+        src = [1.0, 0.0]
+        sys = generator_reactions(G; source=src)
+        u = [10.0, 5.0]
+        du = zeros(2); cle_drift!(du, sys, u, nothing, 0.0)
+        @test isapprox(du, G * u .+ src; atol=1e-10)    # drift = deterministic RHS
+        M = zeros(2, num_reactions(sys)); cle_noise!(M, sys, u, nothing, 0.0)
+        D = M * M'
+        @test isapprox(D, D'; atol=1e-12)               # symmetric demographic diffusion
+        @test all(diag(D) .>= 0)
+    end
 end
