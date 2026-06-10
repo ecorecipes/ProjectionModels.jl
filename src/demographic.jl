@@ -51,6 +51,29 @@ end
 # ----------------------------------------------------------------------------
 
 """
+    rand_binomial(rng, n, p)
+
+Draw a `Binomial(n, p)` integer. Exact (sum of Bernoullis) for `n ≤ 64`, and a
+Normal approximation (matching mean and variance, rounded and clamped to
+`[0, n]`) for larger `n` — so a super-individual cohort of `n` shares one draw.
+"""
+function rand_binomial(rng::AbstractRNG, n::Integer, p::Real)
+    (n <= 0 || p <= 0) && return 0
+    p >= 1 && return Int(n)
+    if n <= 64
+        c = 0
+        for _ in 1:n
+            rand(rng) < p && (c += 1)
+        end
+        return c
+    else
+        μ = n * p
+        σ = sqrt(n * p * (1 - p))
+        return clamp(round(Int, μ + σ * randn(rng)), 0, Int(n))
+    end
+end
+
+"""
     demographic_step!(rng, n_next, n, transition, fecundity)
 
 One demographic-stochastic update of the integer count vector `n` into `n_next`.

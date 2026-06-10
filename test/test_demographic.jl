@@ -15,6 +15,18 @@ using Statistics
         @test rand_poisson(rng, -1.0) == 0
     end
 
+    @testset "rand_binomial mean/variance" begin
+        for n in (20, 500)                 # exact (≤64) and Normal-approx branches
+            xs = [rand_binomial(rng, n, 0.3) for _ in 1:20000]
+            @test isapprox(mean(xs), n * 0.3; rtol=0.03)
+            @test isapprox(var(xs), n * 0.3 * 0.7; rtol=0.12)
+            @test all(x -> 0 <= x <= n, xs)
+        end
+        @test rand_binomial(rng, 10, 0.0) == 0
+        @test rand_binomial(rng, 10, 1.0) == 10
+        @test rand_binomial(rng, 0, 0.5) == 0
+    end
+
     @testset "demographic_step! conditional mean = operator" begin
         U = [0.0 0.0; 0.6 0.5]          # sub-stochastic survival/growth
         F = [2.0 1.0; 0.0 0.0]          # fecundity

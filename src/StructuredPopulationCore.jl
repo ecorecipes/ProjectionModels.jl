@@ -76,7 +76,7 @@ export simulate_environments, project_markov
 
 # Demographic stochasticity primitives + reaction IR
 include("demographic.jl")
-export rand_poisson, demographic_step, demographic_step!
+export rand_poisson, rand_binomial, demographic_step, demographic_step!
 export DemographicReaction, DemographicReactionSystem
 export propensities!, total_propensity, apply_reaction!, gillespie
 export generator_reactions, num_reactions, cle_drift!, cle_noise!
