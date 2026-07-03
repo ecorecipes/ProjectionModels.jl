@@ -43,6 +43,29 @@ using LinearAlgebra
         @test ea_p.lambda ≈ ea_f.lambda atol=1e-8
     end
 
+    @testset "eigenanalysis_power on an imprimitive (periodic) matrix" begin
+        # Classic period-3 Leslie-style example: only the last stage reproduces,
+        # so the only cycle length is 3 and the dominant eigenvalue is tied in
+        # magnitude with two complex conjugates (the cube roots of s1*s2*F).
+        # Plain power iteration cannot converge here; eigenanalysis_power must
+        # fall back to eigenanalysis_full instead of silently returning a
+        # non-converged, arbitrary result.
+        s1, s2, F = 0.6, 0.5, 4.0
+        Aperiodic = [0.0 0.0 F;
+                     s1  0.0 0.0;
+                     0.0 s2  0.0]
+        @test is_primitive(Aperiodic) == false
+
+        λ_known = cbrt(s1 * s2 * F)
+        ea_p = eigenanalysis_power(Aperiodic)
+        ea_f = eigenanalysis_full(Aperiodic)
+        @test ea_p.lambda ≈ λ_known atol=1e-8
+        @test ea_p.lambda ≈ ea_f.lambda atol=1e-8
+        @test sum(ea_p.stable_dist) ≈ 1.0 atol=1e-8
+        @test all(ea_p.stable_dist .>= 0)
+        @test dot(ea_p.repro_value, ea_p.stable_dist) ≈ 1.0 atol=1e-6
+    end
+
     @testset "lambda (matrix)" begin
         λ = lambda(A)
         @test λ ≈ eigenanalysis_full(A).lambda atol=1e-10

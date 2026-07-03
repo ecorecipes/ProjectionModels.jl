@@ -46,6 +46,45 @@ using Statistics
         @test length(out) == 2 && all(>=(0), out)
     end
 
+    @testset "demographic_step! multi-class stick-breaking Multinomial" begin
+        # 4 source/destination classes exercises the sequential-Binomial
+        # partition across more than one non-trivial destination per column,
+        # including a column that sums to exactly 1 (no mortality) and one
+        # with a zero-probability destination.
+        U = [0.1 0.0 0.0 0.0;
+             0.3 0.2 0.0 0.0;
+             0.0 0.5 0.4 0.0;
+             0.0 0.0 0.6 1.0]
+        F = zeros(4, 4)
+        n = [1000, 800, 600, 400]
+        reps = 3000
+        acc = zeros(4)
+        nn = zeros(Int, 4)
+        for _ in 1:reps
+            demographic_step!(rng, nn, n, U, F)
+            @test all(>=(0), nn)
+            @test sum(nn) <= sum(n)  # no column exceeds its stochastic bound
+            acc .+= nn
+        end
+        @test isapprox(acc ./ reps, U * n; rtol=0.05)
+    end
+
+    @testset "demographic_step! large population performance/correctness" begin
+        # The stick-breaking rewrite must stay O(k) per source class regardless
+        # of population size; this both documents that and checks correctness
+        # at a population scale where the old O(n) per-individual loop would
+        # have been noticeably slower.
+        U = [0.0 0.0; 0.7 0.4]
+        F = [3.0 0.5; 0.0 0.0]
+        n = [1_000_000, 1_000_000]
+        nn = zeros(Int, 2)
+        elapsed = @elapsed demographic_step!(rng, nn, n, U, F)
+        @test elapsed < 1.0
+        @test all(>=(0), nn)
+        expected = (U .+ F) * n
+        @test isapprox(nn, expected; rtol=0.02)
+    end
+
     @testset "reaction IR construction" begin
         rx = DemographicReaction(1.5, 3, 1 => -1, 2 => +1)
         @test rx.stoichiometry == [-1, 1, 0]

@@ -3,6 +3,33 @@ Matrix properties: is_irreducible, is_primitive, is_ergodic.
 """
 
 """
+    _all_positive_power(M::AbstractMatrix, power::Integer)
+
+Test whether `M^power` has all strictly positive entries. `M` must be
+non-negative and `power >= 1`. Uses exponentiation by squaring, so this costs
+`O(log(power))` matrix multiplications instead of `O(power)` — important
+since [`is_primitive`](@ref) uses a Wielandt bound of `n^2 - 2n + 2`, which
+grows quickly for the larger state spaces common in IPM/PSPM discretizations.
+"""
+function _all_positive_power(M::AbstractMatrix, power::Integer)
+    power >= 1 || throw(ArgumentError("power must be positive, got $power"))
+    n = size(M, 1)
+    result = Matrix{Float64}(I, n, n)
+    base = M
+    p = power
+    while p > 0
+        if isodd(p)
+            result = result * base
+        end
+        p >>= 1
+        if p > 0
+            base = base * base
+        end
+    end
+    return all(result .> 0)
+end
+
+"""
     is_irreducible(A::AbstractMatrix)
 
 Test if matrix A is irreducible. A non-negative matrix is irreducible if
@@ -13,11 +40,7 @@ function is_irreducible(A::AbstractMatrix)
     n = size(A, 1)
     n == 1 && return true
     B = Matrix{Float64}(I, n, n) .+ abs.(A)
-    M = B
-    for _ in 2:(n-1)
-        M = M * B
-    end
-    return all(M .> 0)
+    return _all_positive_power(B, n - 1)
 end
 
 """
@@ -33,11 +56,7 @@ function is_primitive(A::AbstractMatrix)
     !is_irreducible(A) && return false
     power = n^2 - 2*n + 2
     M = float.(abs.(A))
-    B = copy(M)
-    for _ in 2:power
-        B = B * M
-    end
-    return all(B .> 0)
+    return _all_positive_power(M, power)
 end
 
 """

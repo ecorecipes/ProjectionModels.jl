@@ -1,5 +1,6 @@
 using Test
 using StructuredPopulationCore
+using Random
 
 @testset "LTRE Analysis" begin
     # Test matrices (from exactLTRE R package examples)
@@ -73,6 +74,29 @@ using StructuredPopulationCore
         @test size(result.cont_correlation) == (3, 3)
         @test isfinite(result.r_treatment)
         @test isfinite(result.r_reference)
+    end
+
+    @testset "Stochastic LTRE" begin
+        # Small times/burn_in to keep the O(n^2) sensitivity simulation fast;
+        # this is checking plumbing/reproducibility, not statistical precision.
+        result = stochastic_ltre([A1, A2], [A3];
+            times=400, burn_in=50, rng=Random.Xoshiro(1))
+        @test result isa StochasticLTREResult
+        @test size(result.cont_mean) == (3, 3)
+        @test size(result.cont_sd) == (3, 3)
+        @test size(result.mean_diff) == (3, 3)
+        @test size(result.sd_diff) == (3, 3)
+        @test isfinite(result.lambda_s_treatment)
+        @test isfinite(result.lambda_s_reference)
+
+        # Explicit rng makes the simulation reproducible.
+        result_a = stochastic_ltre([A1, A2], [A3];
+            times=400, burn_in=50, rng=Random.Xoshiro(42))
+        result_b = stochastic_ltre([A1, A2], [A3];
+            times=400, burn_in=50, rng=Random.Xoshiro(42))
+        @test result_a.lambda_s_treatment == result_b.lambda_s_treatment
+        @test result_a.lambda_s_reference == result_b.lambda_s_reference
+        @test result_a.cont_mean == result_b.cont_mean
     end
 
     @testset "G-matrix" begin

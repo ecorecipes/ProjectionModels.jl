@@ -232,7 +232,7 @@ end
 """
     stochastic_ltre(treatment_mats::AbstractVector{<:AbstractMatrix},
                     reference_mats::AbstractVector{<:AbstractMatrix};
-                    times=10000, burn_in=3000, seed=nothing)
+                    times=10000, burn_in=3000, rng=Random.default_rng())
 
 Stochastic LTRE following Davison et al. (2010).
 
@@ -248,11 +248,12 @@ Uses simulation to estimate stochastic sensitivities to mean and variance.
 - `reference_mats`: Vector of annual matrices for the reference population
 - `times`: Number of time steps for stochastic simulation
 - `burn_in`: Steps to discard before computing growth rates
-- `seed`: Optional random seed
+- `rng`: Random number generator used for all stochastic simulation, for reproducibility
 """
 function stochastic_ltre(treatment_mats::AbstractVector{<:AbstractMatrix},
                          reference_mats::AbstractVector{<:AbstractMatrix};
-                         times::Int=10000, burn_in::Int=3000)
+                         times::Int=10000, burn_in::Int=3000,
+                         rng::AbstractRNG=Random.default_rng())
     isempty(treatment_mats) && throw(ArgumentError("treatment_mats cannot be empty"))
     isempty(reference_mats) && throw(ArgumentError("reference_mats cannot be empty"))
 
@@ -275,17 +276,16 @@ function stochastic_ltre(treatment_mats::AbstractVector{<:AbstractMatrix},
     mid_sd = (sd_treat .+ sd_ref) ./ 2
 
     # Stochastic sensitivities via simulation
-    # seed handling removed for simplicity; use global RNG
     sens_mean, sens_sd = _stochastic_sensitivities(mid_mean, mid_sd, n;
-                                                    times=times, burn_in=burn_in)
+                                                    times=times, burn_in=burn_in, rng=rng)
 
     # Contributions
     cont_mean = mean_diff .* sens_mean
     cont_sd = sd_diff .* sens_sd
 
     # Stochastic growth rates
-    λs_treat = _simulate_stochastic_lambda(treatment_mats; times=times, burn_in=burn_in)
-    λs_ref = _simulate_stochastic_lambda(reference_mats; times=times, burn_in=burn_in)
+    λs_treat = _simulate_stochastic_lambda(treatment_mats; times=times, burn_in=burn_in, rng=rng)
+    λs_ref = _simulate_stochastic_lambda(reference_mats; times=times, burn_in=burn_in, rng=rng)
 
     return StochasticLTREResult{T}(cont_mean, cont_sd, mean_diff, sd_diff, λs_treat, λs_ref)
 end
@@ -461,7 +461,8 @@ end
 
 """Simulate stochastic growth rate by random matrix sampling."""
 function _simulate_stochastic_lambda(mats::AbstractVector{<:AbstractMatrix};
-                                     times::Int=10000, burn_in::Int=3000)
+                                     times::Int=10000, burn_in::Int=3000,
+                                     rng::AbstractRNG=Random.default_rng())
     n = size(mats[1], 1)
     k = length(mats)
     pop = ones(Float64, n)
@@ -469,7 +470,7 @@ function _simulate_stochastic_lambda(mats::AbstractVector{<:AbstractMatrix};
 
     log_lambdas = zeros(Float64, times)
     for t in 1:times
-        idx = rand(1:k)
+        idx = rand(rng, 1:k)
         pop_new = mats[idx] * pop
         nt = sum(pop_new)
         if nt > 0
@@ -489,14 +490,14 @@ end
 """Compute stochastic sensitivities to mean and SD via numerical perturbation."""
 function _stochastic_sensitivities(mid_mean::AbstractMatrix, mid_sd::AbstractMatrix,
                                    n::Int; times::Int=10000, burn_in::Int=3000,
-                                   pert::Float64=1e-4)
+                                   pert::Float64=1e-4, rng::AbstractRNG=Random.default_rng())
     T = Float64
 
     # Generate matrices from mid_mean + Normal(0, mid_sd) for baseline
     function generate_mats(μ, σ; n_env=50)
         mats = Matrix{T}[]
         for _ in 1:n_env
-            m = μ .+ σ .* randn(T, size(μ)...)
+            m = μ .+ σ .* randn(rng, T, size(μ)...)
             m = max.(m, zero(T))  # keep non-negative
             push!(mats, m)
         end
@@ -504,7 +505,7 @@ function _stochastic_sensitivities(mid_mean::AbstractMatrix, mid_sd::AbstractMat
     end
 
     base_mats = generate_mats(mid_mean, mid_sd)
-    base_λs = _simulate_stochastic_lambda(base_mats; times=times, burn_in=burn_in)
+    base_λs = _simulate_stochastic_lambda(base_mats; times=times, burn_in=burn_in, rng=rng)
     base_r = log(max(base_λs, eps(T)))
 
     sens_mean = zeros(T, n, n)
@@ -515,14 +516,14 @@ function _stochastic_sensitivities(mid_mean::AbstractMatrix, mid_sd::AbstractMat
         μ_pert = copy(mid_mean)
         μ_pert[i, j] += pert
         pert_mats = generate_mats(μ_pert, mid_sd)
-        pert_r = log(max(_simulate_stochastic_lambda(pert_mats; times=times, burn_in=burn_in), eps(T)))
+        pert_r = log(max(_simulate_stochastic_lambda(pert_mats; times=times, burn_in=burn_in, rng=rng), eps(T)))
         sens_mean[i, j] = (pert_r - base_r) / pert
 
         # Sensitivity to SD
         σ_pert = copy(mid_sd)
         σ_pert[i, j] += pert
         pert_mats = generate_mats(mid_mean, σ_pert)
-        pert_r = log(max(_simulate_stochastic_lambda(pert_mats; times=times, burn_in=burn_in), eps(T)))
+        pert_r = log(max(_simulate_stochastic_lambda(pert_mats; times=times, burn_in=burn_in, rng=rng), eps(T)))
         sens_sd[i, j] = (pert_r - base_r) / pert
     end
 
@@ -651,11 +652,7 @@ function exact_ltre(treatment::AbstractMatrix, reference::AbstractMatrix;
         end
         m1 = reshape(vec_m1, n, n)
         m2 = reshape(vec_m2, n, n)
-        if directional
-            responses[idx] = lambda(m2) - lambda(m1)
-        else
-            responses[idx] = lambda(m2) - lambda(m1)
-        end
+        responses[idx] = lambda(m2) - lambda(m1)
     end
 
     # Compute effects via inclusion-exclusion (Möbius inversion)
@@ -775,27 +772,10 @@ function _compute_effects(responses::Vector{T}, subsets::Vector{Vector{Int}},
     effects = zeros(T, n_terms)
     effects[1] = responses[1]  # empty set response
 
-    # For each term, subtract lower-order contributions
+    # Direct Möbius inversion: ε(S) = Σ_{T⊆S} (-1)^{|S|-|T|} ν(T)
     for i in 2:n_terms
         s_i = Set(subsets[i])
         order_i = length(subsets[i])
-
-        # Sum over all proper subsets of s_i that appear in our list
-        correction = zero(T)
-        for j in 1:(i-1)
-            s_j = Set(subsets[j])
-            if issubset(s_j, s_i)
-                # Inclusion-exclusion sign: (-1)^(order_i - order_j)
-                order_j = length(subsets[j])
-                sign = iseven(order_i - order_j) ? one(T) : -one(T)
-                correction += sign * responses[j]
-            end
-        end
-        effects[i] = responses[i] - correction +
-                     (iseven(order_i) ? responses[1] : -responses[1]) -
-                     responses[1]  # adjust for initial term
-
-        # Actually, use direct Möbius: ε(S) = Σ_{T⊆S} (-1)^{|S|-|T|} ν(T)
         effects[i] = zero(T)
         for j in 1:n_terms
             s_j = Set(subsets[j])

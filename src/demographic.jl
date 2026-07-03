@@ -87,6 +87,14 @@ One demographic-stochastic update of the integer count vector `n` into `n_next`.
 
 The conditional mean is `E[n_next | n] = (transition + fecundity) * n`, so the
 update is an unbiased finite-population realization of the deterministic operator.
+
+The `Multinomial` partition is realized via sequential conditional `Binomial`
+draws (the standard "stick-breaking" construction: destination `i` draws
+`Binomial(remaining, transition[i,j] / (1 - Σ_{i'<i} transition[i',j]))`
+individuals from those not yet assigned) rather than one categorical draw per
+individual, so a source class of `n[j]` individuals costs `O(k)` `Binomial`
+draws instead of `O(n[j])` — identical distribution, no per-individual loop.
+
 Returns `n_next`.
 """
 function demographic_step!(rng::AbstractRNG, n_next::AbstractVector{<:Integer},
@@ -94,22 +102,27 @@ function demographic_step!(rng::AbstractRNG, n_next::AbstractVector{<:Integer},
                            transition::AbstractMatrix, fecundity::AbstractMatrix)
     k = length(n)
     fill!(n_next, 0)
-    # Survival / movement: Multinomial partition of each source class.
+    # Survival / movement: sequential-Binomial ("stick-breaking") realization of
+    # the Multinomial partition of each source class.
     @inbounds for j in 1:k
-        nj = n[j]
-        nj == 0 && continue
-        for _ in 1:nj
-            r = rand(rng)
-            cum = 0.0
-            for i in 1:k
-                cum += transition[i, j]
-                if r < cum
-                    n_next[i] += 1
-                    break
+        remaining = Int(n[j])
+        remaining == 0 && continue
+        cum = 0.0
+        for i in 1:k
+            remaining == 0 && break
+            pij = transition[i, j]
+            if pij > 0
+                denom = 1.0 - cum
+                q = denom > 0 ? clamp(pij / denom, 0.0, 1.0) : 1.0
+                drawn = rand_binomial(rng, remaining, q)
+                if drawn > 0
+                    n_next[i] += drawn
+                    remaining -= drawn
                 end
             end
-            # falling through the loop without a match = mortality
+            cum += pij
         end
+        # any individuals left in `remaining` after all k destinations = mortality
     end
     # Fecundity: Poisson offspring.
     @inbounds for j in 1:k

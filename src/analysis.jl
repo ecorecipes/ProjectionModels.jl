@@ -118,8 +118,7 @@ function reproductive_value(sol::AbstractProjectionSolution)
     end
     K = sol.kernel_matrices
     if K isa AbstractMatrix
-        ea = eigenanalysis_power(K)
-        return ea.repro_value
+        return reproductive_value(K)
     end
     error("Reproductive value requires eigenanalysis or a single kernel matrix.")
 end

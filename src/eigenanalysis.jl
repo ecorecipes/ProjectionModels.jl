@@ -10,6 +10,16 @@ and reproductive value (left eigenvector) via power iteration.
 
 Returns a named tuple `(lambda, stable_dist, repro_value)`.
 Reproductive value is normalized so that `dot(v, w) = 1`.
+
+Power iteration only converges when the dominant eigenvalue is unique in
+magnitude. Imprimitive (periodic) non-negative matrices — e.g. a Leslie
+matrix whose only reproductive stage forces a fixed generation cycle — have
+several eigenvalues tied for largest magnitude, so the iterates rotate
+instead of settling down. When convergence is not detected within `maxiter`
+iterations for either the right or left eigenvector, this function falls
+back to [`eigenanalysis_full`](@ref) (a dense `LinearAlgebra.eigen` call)
+so the result is always correct, at the cost of the fast path's typical
+performance advantage only in that (uncommon) case.
 """
 function eigenanalysis_power(A::AbstractMatrix; maxiter=2000, tol=1e-12)
     n = size(A, 1)
@@ -21,6 +31,7 @@ function eigenanalysis_power(A::AbstractMatrix; maxiter=2000, tol=1e-12)
     w_new = similar(w)
 
     λ = one(Te)
+    converged = false
     for _ in 1:maxiter
         mul!(w_new, A, w)
         # Normalize by element with largest absolute value (Rayleigh-style)
@@ -33,11 +44,13 @@ function eigenanalysis_power(A::AbstractMatrix; maxiter=2000, tol=1e-12)
         if maximum(abs, w_new .- w) < tol
             λ = λ_new
             copyto!(w, w_new)
+            converged = true
             break
         end
         λ = λ_new
         copyto!(w, w_new)
     end
+    converged || return eigenanalysis_full(A)
 
     # Make eigenvector non-negative (for non-negative matrices, dominant eigvec is non-neg)
     if all(A .>= 0)
@@ -54,6 +67,7 @@ function eigenanalysis_power(A::AbstractMatrix; maxiter=2000, tol=1e-12)
     v ./= norm(v, 1)
     v_new = similar(v)
 
+    converged = false
     for _ in 1:maxiter
         mul!(v_new, At, v)
         idx = argmax(abs.(v_new))
@@ -64,10 +78,12 @@ function eigenanalysis_power(A::AbstractMatrix; maxiter=2000, tol=1e-12)
         rmul!(v_new, inv(λ_v))
         if maximum(abs, v_new .- v) < tol
             copyto!(v, v_new)
+            converged = true
             break
         end
         copyto!(v, v_new)
     end
+    converged || return eigenanalysis_full(A)
 
     if all(A .>= 0)
         v .= abs.(v)
