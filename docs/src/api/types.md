@@ -50,3 +50,14 @@ AbstractProjectionSolution
 ```@docs
 DelayGeneratorTerm
 ```
+
+## Transport discretizations
+
+Shared by ContinuousStatePopulationDynamics.jl and
+PhysiologicallyBasedDemographicModels.jl, which export them. Not exported from the core
+package.
+
+```@docs
+StructuredPopulationCore.AbstractTransportDiscretization
+StructuredPopulationCore.FixedMeshUpwind
+```

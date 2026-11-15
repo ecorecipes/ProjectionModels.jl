@@ -211,3 +211,34 @@ function DelayGeneratorTerm(lag::Real, operator)
     T = typeof(float(lag))
     DelayGeneratorTerm{T, typeof(operator)}(T(lag), operator)
 end
+
+"""
+    AbstractTransportDiscretization
+
+Supertype for the numerical methods that turn a transport equation over a continuous
+structuring variable (size, age, physiological age) into a system of ordinary
+differential equations.
+
+Not exported from the core package: ContinuousStatePopulationDynamics.jl and
+PhysiologicallyBasedDemographicModels.jl import it and export it, the latter also under
+the name `AbstractPSPMMethod`.
+"""
+abstract type AbstractTransportDiscretization end
+
+"""
+    FixedMeshUpwind(; n_mesh = nothing)
+
+First-order upwind method of lines on a fixed mesh.
+
+`n_mesh` is the number of mesh cells. It is `nothing` when the mesh is given by the
+problem (the `ContinuousDomain` of a `PSPMIPMProblem` in
+ContinuousStatePopulationDynamics.jl) or left to the solving package's default (100
+cells per species in PhysiologicallyBasedDemographicModels.jl).
+
+Not exported from the core package: the packages that use it export it.
+"""
+struct FixedMeshUpwind <: AbstractTransportDiscretization
+    n_mesh::Union{Nothing, Int}
+end
+
+FixedMeshUpwind(; n_mesh::Union{Nothing, Integer} = nothing) = FixedMeshUpwind(n_mesh)

@@ -7,6 +7,17 @@
     @test SimpleContinuousState() isa AbstractContinuousStateStructure
     @test GeneralContinuousState() isa AbstractContinuousStateStructure
 
+    # Transport discretization shared by the continuous-state and PBDM packages (not exported here)
+    let SPC = StructuredPopulationCore
+        @test !Base.isexported(SPC, :FixedMeshUpwind)
+        @test !Base.isexported(SPC, :AbstractTransportDiscretization)
+        @test isabstracttype(SPC.AbstractTransportDiscretization)
+        @test SPC.FixedMeshUpwind() isa SPC.AbstractTransportDiscretization
+        @test SPC.FixedMeshUpwind().n_mesh === nothing
+        @test SPC.FixedMeshUpwind(n_mesh = 40).n_mesh == 40
+        @test SPC.FixedMeshUpwind(40) == SPC.FixedMeshUpwind(n_mesh = Int32(40))
+    end
+
     @test DiscreteTime() isa AbstractTimeSemantics
     @test ContinuousTime() isa AbstractTimeSemantics
     @test FiniteState() isa AbstractStateSemantics

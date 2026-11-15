@@ -50,10 +50,12 @@
 
     @testset "verbs declared for the model packages" begin
         # declared here, without methods, so that every model package extends the same function
-        for f in (compose_from_uwd, demographic_ensemble, to_discrete_problem, to_ode_problem, to_dde_problem,
-                  StructuredPopulationCore.set_state!)
+        for f in (compose_from_uwd, demographic_ensemble, to_discrete_problem, to_ode_problem, to_dde_problem)
             @test f isa Function && isempty(methods(f))
         end
+        # set_state! has one method here, for the shared PopulationSystem (see test_coupled_systems.jl)
+        @test StructuredPopulationCore.set_state! isa Function
+        @test length(methods(StructuredPopulationCore.set_state!)) == 1
         @test !(:set_state! in names(StructuredPopulationCore))   # exported by the packages that implement it
     end
 end

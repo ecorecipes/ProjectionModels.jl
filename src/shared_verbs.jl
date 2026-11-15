@@ -51,14 +51,19 @@ problems with delay terms).
 function to_dde_problem end
 
 """
+    set_state!(system, name, value)
     set_state!(...)
 
-Set a piece of the state that a model carries. MatrixProjectionModels.jl adds
-`set_state!(system, name, value)` for the named auxiliary state of a `PopulationSystem`,
-and FiniteStatePopulationDynamics.jl adds `set_state!(integrator, domain, label, value)`
-for use in events.
+Set a piece of the state that a model carries.
 
-Declared here so that the two are one function. It is not exported from the core package:
-each of those packages exports it.
+`set_state!(system, name, value)` sets the named auxiliary state of a
+[`PopulationSystem`](@ref StructuredPopulationCore.PopulationSystem). If the entry is an
+[`AbstractStateVariable`](@ref StructuredPopulationCore.AbstractStateVariable) the call is
+passed on to `set_state!(variable, value)`; otherwise the entry is replaced, or created.
+FiniteStatePopulationDynamics.jl adds `set_state!(integrator, domain, label, value)` for
+use in events.
+
+Declared here so that these are one function. It is not exported from the core package:
+the packages that use it export it.
 """
 function set_state! end

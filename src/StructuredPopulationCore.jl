@@ -31,6 +31,11 @@ export left_kan_extension, right_kan_extension, stratify, coarsen, compose_from_
 include("shared_verbs.jl")
 export demographic_ensemble, to_discrete_problem, to_ode_problem, to_dde_problem
 
+# Coupled population systems: components, systems, events, rules and observables shared by
+# MatrixProjectionModels.jl and PhysiologicallyBasedDemographicModels.jl. Not exported from
+# here: those packages import the names and export them.
+include("coupled_systems.jl")
+
 # Solution interface
 include("solution.jl")
 export AbstractProjectionSolution

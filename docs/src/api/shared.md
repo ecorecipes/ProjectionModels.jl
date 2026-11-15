@@ -32,3 +32,61 @@ to_ode_problem
 to_dde_problem
 StructuredPopulationCore.set_state!
 ```
+
+## Coupled population systems
+
+The data layer for systems of several named components with auxiliary state, scheduled
+events, interaction rules and observables. MatrixProjectionModels.jl and
+PhysiologicallyBasedDemographicModels.jl both build on it: they import these names, export
+them, and add the solver that steps a system. None of the names is exported from the core
+package.
+
+A component carries its numbers in `component.population`. The core handles stage vectors.
+A package with another kind of carrier adds methods of `total_population`, `inject!`,
+`remove_fraction!` and `as_component` for it.
+
+### Components and systems
+
+```@docs
+StructuredPopulationCore.PopulationComponent
+StructuredPopulationCore.PopulationSystem
+StructuredPopulationCore.AbstractStateVariable
+StructuredPopulationCore.get_state
+StructuredPopulationCore.has_state
+StructuredPopulationCore.total_population
+StructuredPopulationCore.component_total
+StructuredPopulationCore.component_totals
+StructuredPopulationCore.by_species
+StructuredPopulationCore.by_type
+StructuredPopulationCore.by_patch
+StructuredPopulationCore.inject!
+StructuredPopulationCore.remove_fraction!
+```
+
+### Events, rules and observables
+
+```@docs
+StructuredPopulationCore.AbstractScheduledEvent
+StructuredPopulationCore.apply_event!
+StructuredPopulationCore.PulseRelease
+StructuredPopulationCore.SingleDayRelease
+StructuredPopulationCore.SprayEvent
+StructuredPopulationCore.AbstractInteractionRule
+StructuredPopulationCore.TransferRule
+StructuredPopulationCore.ReproductionRule
+StructuredPopulationCore.MortalityRule
+StructuredPopulationCore.CustomRule
+StructuredPopulationCore.Observable
+```
+
+### Functions the model packages extend
+
+```@docs
+StructuredPopulationCore.n_stages
+StructuredPopulationCore.allocate
+StructuredPopulationCore.supply_demand_index
+StructuredPopulationCore.as_component
+StructuredPopulationCore.component_stage_names
+StructuredPopulationCore.validate_component_model
+StructuredPopulationCore.convert_component
+```
