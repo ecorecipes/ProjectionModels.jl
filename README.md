@@ -16,7 +16,7 @@ This package is not yet registered in the Julia General registry. Install direct
 
 ```julia
 using Pkg
-Pkg.add(url="https://github.com/ecorecipes/StructuredPopulationCore.jl")
+Pkg.add(url="https://github.com/ecorecipes/ProjectionModels.jl")   # the package StructuredPopulationCore
 ```
 
 ## Related
