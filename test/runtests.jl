@@ -133,6 +133,7 @@ using LinearAlgebra
     end
 
     include("test_shared_continuous.jl")
+    include("test_categorical.jl")
     include("test_state_blocks.jl")
     include("test_time_lag.jl")
     include("test_ltre.jl")

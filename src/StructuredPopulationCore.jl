@@ -23,6 +23,14 @@ include("domains.jl")
 export AbstractStateDomain, ContinuousDomain, DiscreteDomain
 export meshpoints, step_size, bounds, n_states
 
+# Kernels to matrices and back, stratification, coarsening (shared with the model packages)
+include("categorical.jl")
+export left_kan_extension, right_kan_extension, stratify, coarsen, compose_from_uwd
+
+# Verbs that each model package implements for its own problem type
+include("shared_verbs.jl")
+export demographic_ensemble, to_discrete_problem
+
 # Solution interface
 include("solution.jl")
 export AbstractProjectionSolution

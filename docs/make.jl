@@ -14,6 +14,7 @@ makedocs(;
         "API Reference" => [
             "Types" => "api/types.md",
             "State Domains & Blocks" => "api/state_blocks.md",
+            "Shared Operations & Verbs" => "api/shared.md",
             "Analysis" => "api/analysis.md",
             "Eigenanalysis" => "api/eigenanalysis.md",
             "Matrix Properties" => "api/properties.md",
