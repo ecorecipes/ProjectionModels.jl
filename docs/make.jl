@@ -7,7 +7,7 @@ makedocs(;
     sitename = "StructuredPopulationCore.jl",
     format = Documenter.HTML(;
         prettyurls = get(ENV, "CI", "false") == "true",
-        canonical = "https://ecorecipes.github.io/StructuredPopulationCore.jl",
+        canonical = "https://ecorecipes.github.io/ProjectionModels.jl",
     ),
     pages = [
         "Home" => "index.md",
@@ -25,5 +25,5 @@ makedocs(;
 )
 
 deploydocs(;
-    repo = "github.com/ecorecipes/StructuredPopulationCore.jl.git",
+    repo = "github.com/ecorecipes/ProjectionModels.jl.git",
 )

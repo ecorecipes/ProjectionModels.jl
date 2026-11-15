@@ -28,4 +28,7 @@ type. `remake` is shared in the same way, through `SciMLBase.remake`.
 ```@docs
 demographic_ensemble
 to_discrete_problem
+to_ode_problem
+to_dde_problem
+StructuredPopulationCore.set_state!
 ```

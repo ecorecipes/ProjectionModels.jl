@@ -29,3 +29,36 @@ Each model package adds the method for its own problem type (`MPMProblem`,
 `CoupledMPMProblem`, `IPMProblem`).
 """
 function to_discrete_problem end
+
+"""
+    to_ode_problem(prob)
+
+Convert a continuous-time problem to a `SciMLBase.ODEProblem`.
+
+Each package adds the method for its own problem type (continuous-state generator and
+transport problems, finite-state generator problems).
+"""
+function to_ode_problem end
+
+"""
+    to_dde_problem(prob)
+
+Convert a continuous-time problem with delays to a `SciMLBase.DDEProblem`.
+
+Each package adds the method for its own problem type (continuous-state and finite-state
+problems with delay terms).
+"""
+function to_dde_problem end
+
+"""
+    set_state!(...)
+
+Set a piece of the state that a model carries. MatrixProjectionModels.jl adds
+`set_state!(system, name, value)` for the named auxiliary state of a `PopulationSystem`,
+and FiniteStatePopulationDynamics.jl adds `set_state!(integrator, domain, label, value)`
+for use in events.
+
+Declared here so that the two are one function. It is not exported from the core package:
+each of those packages exports it.
+"""
+function set_state! end

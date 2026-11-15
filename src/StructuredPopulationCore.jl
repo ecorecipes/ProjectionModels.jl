@@ -29,7 +29,7 @@ export left_kan_extension, right_kan_extension, stratify, coarsen, compose_from_
 
 # Verbs that each model package implements for its own problem type
 include("shared_verbs.jl")
-export demographic_ensemble, to_discrete_problem
+export demographic_ensemble, to_discrete_problem, to_ode_problem, to_dde_problem
 
 # Solution interface
 include("solution.jl")
