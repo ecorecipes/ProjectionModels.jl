@@ -36,6 +36,11 @@ export demographic_ensemble, to_discrete_problem, to_ode_problem, to_dde_problem
 # here: those packages import the names and export them.
 include("coupled_systems.jl")
 
+# The engine that steps a coupled system one time step at a time: substeps, rule effects, and
+# the loop over time steps. Shared by MatrixProjectionModels.jl and IntegralProjectionModels.jl,
+# which supply how a component is stepped. Not exported from here either.
+include("coupled_stepping.jl")
+
 # Solution interface
 include("solution.jl")
 export AbstractProjectionSolution

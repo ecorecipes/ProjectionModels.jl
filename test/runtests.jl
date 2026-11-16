@@ -140,5 +140,6 @@ using LinearAlgebra
     include("test_demographic.jl")
     include("test_individual_samplers.jl")
     include("test_coupled_systems.jl")
+    include("test_coupled_stepping.jl")
 
 end
